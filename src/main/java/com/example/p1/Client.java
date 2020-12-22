@@ -145,7 +145,7 @@ public class Client {
                     System.out.println("1. Adicionar usuário");
                     final User user = fetchUser();
                     try {
-                        collection.add(user);
+                        collection.create(user);
                     } catch (RemoteException e) {
                         System.out.println("Erro remoto.");
                         e.printStackTrace();
@@ -159,7 +159,7 @@ public class Client {
                     System.out.println("2. Listar usuários por curso");
                     fetchAnswer("Curso: ", answer -> {
                         try {
-                            final List<User> users = collection.getUsers().stream()
+                            final List<User> users = collection.read().stream()
                                 .filter(user -> user.formation.equalsIgnoreCase(answer))
                                 .collect(Collectors.toList());
 
@@ -177,7 +177,7 @@ public class Client {
                     System.out.println("3. Listar habilidades de usuários por endereço");
                     fetchAnswer("Endereço: ", answer -> {
                         try {
-                            final List<User> users = collection.getUsers().stream()
+                            final List<User> users = collection.read().stream()
                                 .filter(user -> user.address.equalsIgnoreCase(answer))
                                 .collect(Collectors.toList());
 
@@ -193,26 +193,20 @@ public class Client {
                 }
                 case 4: {
                     System.out.println("4. Acrescentar experiência de um usuário");
-                    fetchAnswer("E-mail: ", email -> {
-                        final Optional<User> optional;
+                    fetchAnswer("E-mail: ", email -> fetchAnswer("Experiência: ", job -> {
                         try {
-                            optional = collection.getUsers().stream()
-                                .filter(u -> u.email.equalsIgnoreCase(email))
-                                .findFirst();
+                            final boolean result = collection.update(email, UserCollection.UPDATE_KEY_EXPERIENCE, job);
+                            if (result) {
+                                System.out.println("Experiência adicionada.");
+                            } else {
+                                System.out.println("O e-mail informado não se encontra na base de dados.");
+                            }
 
                         } catch (RemoteException e) {
                             System.out.println("Erro remoto.");
                             e.printStackTrace();
-                            return;
                         }
-
-                        if (optional.isPresent()) {
-                            fetchAnswer("Experiência: ", job -> optional.get().addExperience(job));
-                            System.out.println("Experiência adicionada.");
-                        } else {
-                            System.out.println("O e-mail informado não se encontra na base de dados.");
-                        }
-                    });
+                    }));
                     break;
                 }
                 case 5: {
@@ -220,7 +214,7 @@ public class Client {
                     fetchAnswer("E-mail: ", email -> {
                         final Optional<User> optional;
                         try {
-                            optional = collection.getUsers().stream()
+                            optional = collection.read().stream()
                                 .filter(u -> u.email.equalsIgnoreCase(email))
                                 .findFirst();
 
@@ -242,7 +236,7 @@ public class Client {
                     System.out.println("6. Listar informações de todos os usuários");
                     final List<User> users;
                     try {
-                        users = collection.getUsers();
+                        users = collection.read();
 
                     } catch (RemoteException e) {
                         System.out.println("Erro remoto.");
@@ -261,7 +255,7 @@ public class Client {
                     fetchAnswer("E-mail: ", email -> {
                         final Optional<User> optional;
                         try {
-                            optional = collection.getUsers().stream()
+                            optional = collection.read().stream()
                                 .filter(u -> u.email.equalsIgnoreCase(email))
                                 .findFirst();
 

@@ -35,6 +35,10 @@ public final class User implements Serializable {
         return Collections.unmodifiableList(experience);
     }
 
+    public void addAbility(final String ability) {
+        abilities.add(ability);
+    }
+
     public void addExperience(final String job) {
         experience.add(job);
     }

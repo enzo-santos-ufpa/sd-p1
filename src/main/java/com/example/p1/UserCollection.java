@@ -5,7 +5,13 @@ import java.rmi.RemoteException;
 import java.util.List;
 
 public interface UserCollection extends Remote {
-    boolean add(final User user) throws RemoteException;
+    String UPDATE_KEY_EXPERIENCE = "experience";
 
-    List<User> getUsers() throws RemoteException;
+    String UPDATE_KEY_ABILITY = "ability";
+
+    boolean create(final User user) throws RemoteException;
+
+    List<User> read() throws RemoteException;
+
+    boolean update(final String email, final String key, final String value) throws RemoteException;
 }
