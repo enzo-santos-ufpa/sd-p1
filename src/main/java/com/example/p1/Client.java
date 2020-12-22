@@ -40,7 +40,7 @@ public class Client {
     }
 
     private static void fetchAnswer(final String field, final Consumer<String> parser) {
-        System.out.println(field);
+        System.out.print(field);
         parser.accept(scanner.nextLine().strip());
     }
 
@@ -49,7 +49,7 @@ public class Client {
         final Function<String, T> parser,
         final Predicate<T> condition
     ) {
-        System.out.println(field);
+        System.out.print(field);
         for (; ; ) {
             final T result = parser.apply(scanner.nextLine().strip());
             if (condition.test(result)) {
@@ -65,7 +65,7 @@ public class Client {
         System.out.println("Formação acadêmica: " + user.formation);
         System.out.println("Possui foto? " + (user.pictureData.length > 0 ? "Sim" : "Não"));
         System.out.println("Habilidades: " + user.getAbilities());
-        System.out.println("Experiências: " + user.getJobs());
+        System.out.println("Experiências: " + user.getExperience());
     }
 
     private static User fetchUser() {
@@ -100,7 +100,7 @@ public class Client {
         });
         fetchAnswer("Experiências [separado por poonto e vírgula, ENTER para nenhuma]: ", answer -> {
             if (!answer.isEmpty()) {
-                builder.setPreviousJobs(Arrays.stream(answer.split(";"))
+                builder.setExperience(Arrays.stream(answer.split(";"))
                     .map(String::strip).collect(Collectors.toList()));
             }
         });
@@ -109,11 +109,12 @@ public class Client {
     }
 
     public static void main(String[] args) {
-        if (args.length != 1) {
-            System.out.println("Uso: java com.example.p1.Client [host]");
+        if (args.length < 1) {
+            System.out.println("Uso: java com.example.p1.Client host [debug=true,false]");
             return;
         }
         final String hostname = args[0];
+        final boolean debug = args.length >= 2 && Boolean.parseBoolean(args[1]);
 
         final Registry registry;
         try {
@@ -126,7 +127,9 @@ public class Client {
 
         final UserCollection collection;
         try {
-            collection = (UserCollection) registry.lookup("UserManager");
+            final UserCollection obj = (UserCollection) registry.lookup("UserManager");
+            collection = debug ? new DebugUserCollection(obj) : obj;
+
         } catch (RemoteException | NotBoundException e) {
             System.out.println("Erro remoto.");
             e.printStackTrace();
@@ -144,8 +147,8 @@ public class Client {
                     try {
                         collection.add(user);
                     } catch (RemoteException e) {
-                        e.printStackTrace();
                         System.out.println("Erro remoto.");
+                        e.printStackTrace();
                         return;
                     }
 
@@ -164,8 +167,8 @@ public class Client {
                             users.forEach(user -> System.out.println(user.email));
 
                         } catch (RemoteException e) {
-                            e.printStackTrace();
                             System.out.println("Erro remoto.");
+                            e.printStackTrace();
                         }
                     });
                     break;
@@ -182,8 +185,8 @@ public class Client {
                             users.forEach(user -> System.out.println(user.getAbilities()));
 
                         } catch (RemoteException e) {
-                            e.printStackTrace();
                             System.out.println("Erro remoto.");
+                            e.printStackTrace();
                         }
                     });
                     break;
@@ -191,20 +194,20 @@ public class Client {
                 case 4: {
                     System.out.println("4. Acrescentar experiência de um usuário");
                     fetchAnswer("E-mail: ", email -> {
-                        final Optional<User> user;
+                        final Optional<User> optional;
                         try {
-                            user = collection.getUsers().stream()
+                            optional = collection.getUsers().stream()
                                 .filter(u -> u.email.equalsIgnoreCase(email))
                                 .findFirst();
 
                         } catch (RemoteException e) {
-                            e.printStackTrace();
                             System.out.println("Erro remoto.");
+                            e.printStackTrace();
                             return;
                         }
 
-                        if (user.isPresent()) {
-                            fetchAnswer("Experiência: ", ability -> user.get().addJob(ability));
+                        if (optional.isPresent()) {
+                            fetchAnswer("Experiência: ", job -> optional.get().addExperience(job));
                             System.out.println("Experiência adicionada.");
                         } else {
                             System.out.println("O e-mail informado não se encontra na base de dados.");
@@ -215,19 +218,20 @@ public class Client {
                 case 5: {
                     System.out.println("5. Exibir experiência de um usuário");
                     fetchAnswer("E-mail: ", email -> {
-                        final Optional<User> user;
+                        final Optional<User> optional;
                         try {
-                            user = collection.getUsers().stream()
+                            optional = collection.getUsers().stream()
                                 .filter(u -> u.email.equalsIgnoreCase(email))
                                 .findFirst();
+
                         } catch (RemoteException e) {
-                            e.printStackTrace();
                             System.out.println("Erro remoto.");
+                            e.printStackTrace();
                             return;
                         }
 
-                        if (user.isPresent()) {
-                            System.out.println("Experiências: " + user.get().getJobs());
+                        if (optional.isPresent()) {
+                            System.out.println("Experiências: " + optional.get().getExperience());
                         } else {
                             System.out.println("O e-mail informado não se encontra na base de dados.");
                         }
@@ -239,10 +243,13 @@ public class Client {
                     final List<User> users;
                     try {
                         users = collection.getUsers();
+
                     } catch (RemoteException e) {
                         System.out.println("Erro remoto.");
+                        e.printStackTrace();
                         return;
                     }
+
                     users.forEach(user -> {
                         System.out.println();
                         showUserInformation(user);
@@ -252,20 +259,20 @@ public class Client {
                 case 7: {
                     System.out.println("7. Exibir informação de um usuário");
                     fetchAnswer("E-mail: ", email -> {
-                        final Optional<User> user;
+                        final Optional<User> optional;
                         try {
-                            user = collection.getUsers().stream()
+                            optional = collection.getUsers().stream()
                                 .filter(u -> u.email.equalsIgnoreCase(email))
                                 .findFirst();
 
                         } catch (RemoteException e) {
-                            e.printStackTrace();
                             System.out.println("Erro remoto.");
+                            e.printStackTrace();
                             return;
                         }
 
-                        if (user.isPresent()) {
-                            showUserInformation(user.get());
+                        if (optional.isPresent()) {
+                            showUserInformation(optional.get());
                         } else {
                             System.out.println("O e-mail informado não se encontra na base de dados.");
                         }

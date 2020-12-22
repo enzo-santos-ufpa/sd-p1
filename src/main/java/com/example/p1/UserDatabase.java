@@ -11,8 +11,8 @@ public class UserDatabase implements UserCollection, Serializable {
     private final Set<User> users = new HashSet<>();
 
     @Override
-    public void add(final User user) {
-        users.add(user);
+    public boolean add(final User user) {
+        return users.add(user);
     }
 
     @Override

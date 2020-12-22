@@ -5,7 +5,7 @@ import java.rmi.RemoteException;
 import java.util.List;
 
 public interface UserCollection extends Remote {
-    void add(final User user) throws RemoteException;
+    boolean add(final User user) throws RemoteException;
 
     List<User> getUsers() throws RemoteException;
 }

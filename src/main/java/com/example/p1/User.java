@@ -9,38 +9,34 @@ import java.util.Objects;
 public final class User implements Serializable {
     private static final long serialVersionUID = -530948457L;
 
-    final String email;
-    final String name;
-    final byte[] pictureData;
-    final String address;
-    final String formation;
+    public final String email;
+    public final String name;
+    public final byte[] pictureData;
+    public final String address;
+    public final String formation;
     private final List<String> abilities;
-    private final List<String> jobs;
+    private final List<String> experience;
 
-    private User(String email, String name, byte[] pictureData, String address, String formation, List<String> abilities, List<String> jobs) {
+    private User(String email, String name, byte[] pictureData, String address, String formation, List<String> abilities, List<String> experience) {
         this.email = email;
         this.name = name;
         this.pictureData = pictureData;
         this.address = address;
         this.formation = formation;
         this.abilities = abilities;
-        this.jobs = jobs;
+        this.experience = experience;
     }
 
     public List<String> getAbilities() {
         return Collections.unmodifiableList(abilities);
     }
 
-    public List<String> getJobs() {
-        return Collections.unmodifiableList(jobs);
+    public List<String> getExperience() {
+        return Collections.unmodifiableList(experience);
     }
 
-    public void addJob(final String job) {
-        jobs.add(job);
-    }
-
-    public void addAbility(final String ability) {
-        abilities.add(ability);
+    public void addExperience(final String job) {
+        experience.add(job);
     }
 
     @Override
@@ -63,7 +59,7 @@ public final class User implements Serializable {
         private String formation;
         private byte[] pictureData = new byte[0];
         private final List<String> abilities = new LinkedList<>();
-        private final List<String> jobs = new LinkedList<>();
+        private final List<String> experience = new LinkedList<>();
 
         public Builder setEmail(final String email) {
             this.email = email;
@@ -95,8 +91,8 @@ public final class User implements Serializable {
             return this;
         }
 
-        public Builder setPreviousJobs(final List<String> jobs) {
-            this.jobs.addAll(jobs);
+        public Builder setExperience(final List<String> experience) {
+            this.experience.addAll(experience);
             return this;
         }
 
@@ -114,7 +110,7 @@ public final class User implements Serializable {
                 throw new IllegalStateException("a formação do usuário deve ser inserida.");
             }
 
-            return new User(email, name, pictureData, address, formation, abilities, jobs);
+            return new User(email, name, pictureData, address, formation, abilities, experience);
         }
     }
 }
