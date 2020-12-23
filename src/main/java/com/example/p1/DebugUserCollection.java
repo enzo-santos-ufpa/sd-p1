@@ -3,9 +3,20 @@ package com.example.p1;
 import java.rmi.RemoteException;
 import java.util.List;
 
+/**
+ * Decorador que mostra dados de tempo de execução para operações de uma {@link UserCollection}.
+ */
 public class DebugUserCollection implements UserCollection {
+    /**
+     * Coleção cujo tempo de execução de métodos serão mostrados na tela.
+     */
     private final UserCollection collection;
 
+    /**
+     * Constrói um decorador.
+     *
+     * @param collection a coleção cujo tempo de execução de métodos serão mostrados na tela.
+     */
     public DebugUserCollection(final UserCollection collection) {
         this.collection = collection;
     }

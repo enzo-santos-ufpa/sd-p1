@@ -4,7 +4,18 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 
+/**
+ * Representa o servidor de uma conexão RMI.
+ */
 public class Server {
+    /**
+     * Construtor privado.
+     * <p>
+     * Impede que seja instanciado.
+     */
+    private Server() {
+    }
+
     public static void main(String[] args) {
         if (args.length < 1) {
             System.out.println("Uso: java com.example.p1.Server host [debug=true,false]");

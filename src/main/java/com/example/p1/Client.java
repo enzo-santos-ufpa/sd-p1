@@ -16,13 +16,60 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+/**
+ * Representa o cliente de uma conexão RMI.
+ */
 public class Client {
+    /**
+     * Um leitor que recebe a entrada do usuário.
+     */
     private static final Scanner scanner = new Scanner(System.in);
 
+    /**
+     * Construtor privado.
+     * <p>
+     * Impede que seja instanciado.
+     */
     private Client() {
     }
 
-    private static int fetchOperation() {
+    /**
+     * Lê uma resposta do usuário.
+     *
+     * @param question a pergunta a ser mostrada.
+     * @param consumer uma ação a ser realizada na resposta dada pelo usuário. A resposta é uma
+     *                 {@link String} que o usuário digita no console com espaços do começo e do fim removidos.
+     */
+    private static void fetchAnswer(final String question, final Consumer<String> consumer) {
+        System.out.print(question);
+        consumer.accept(scanner.nextLine().strip());
+    }
+
+    /**
+     * Lê uma resposta do usuário enquanto uma condição não for satisfeita.
+     *
+     * @param question  a pergunta a ser mostrada.
+     * @param parser    uma função que transforma a entrada do usuário (com espaços do
+     *                  início e do fim removidos) em um objeto cuja condição será analisada.
+     * @param condition a condição a ser aplicada sobre o objeto transformado pela entrada do usuário.
+     * @param <T>       o tipo do objeto cuja condição será analisada.
+     */
+    private static <T> void fetchAnswerWhile(String question, Function<String, T> parser, Predicate<T> condition) {
+        System.out.print(question);
+        for (; ; ) {
+            final T result = parser.apply(scanner.nextLine().strip());
+            if (condition.test(result)) {
+                return;
+            }
+        }
+    }
+
+    /**
+     * Mostra um menu com as possíveis operações que o usuário pode realizar no servidor.
+     *
+     * @return a operação retornada ou null caso a entrada seja inválida.
+     */
+    private static Integer fetchOperation() {
         System.out.println("Digite o número da operação a ser realizada.");
         System.out.println();
         System.out.println("1. Adicionar usuário");
@@ -36,28 +83,21 @@ public class Client {
         System.out.println();
         System.out.println("Operação: ");
 
-        return Integer.parseInt(scanner.nextLine().strip());
-    }
+        final String input = scanner.nextLine().strip();
+        try {
+            final int result = Integer.parseInt(input);
+            return (result < 0 || result > 7) ? null : result;
 
-    private static void fetchAnswer(final String field, final Consumer<String> parser) {
-        System.out.print(field);
-        parser.accept(scanner.nextLine().strip());
-    }
-
-    private static <T> void fetchAnswerWhile(
-        final String field,
-        final Function<String, T> parser,
-        final Predicate<T> condition
-    ) {
-        System.out.print(field);
-        for (; ; ) {
-            final T result = parser.apply(scanner.nextLine().strip());
-            if (condition.test(result)) {
-                return;
-            }
+        } catch (NumberFormatException e) {
+            return null;
         }
     }
 
+    /**
+     * Mostra as informações básicas de um usuário na tela.
+     *
+     * @param user o usuário cujas informações serão mostradas.
+     */
     private static void showUserInformation(final User user) {
         System.out.println("Nome: " + user.name);
         System.out.println("E-mail: " + user.email);
@@ -65,9 +105,14 @@ public class Client {
         System.out.println("Formação acadêmica: " + user.formation);
         System.out.println("Possui foto? " + (user.pictureData.length > 0 ? "Sim" : "Não"));
         System.out.println("Habilidades: " + user.getAbilities());
-        System.out.println("Experiências: " + user.getExperience());
+        System.out.println("Experiências: " + user.getExperiences());
     }
 
+    /**
+     * Mostra um menu que permite ao usuário construir um perfil para a base de dados.
+     *
+     * @return o perfil criado.
+     */
     private static User fetchUser() {
         final User.Builder builder = new User.Builder();
 
@@ -116,6 +161,7 @@ public class Client {
         final String hostname = args[0];
         final boolean debug = args.length >= 2 && Boolean.parseBoolean(args[1]);
 
+        // Configuração da conexão RMI
         final Registry registry;
         try {
             registry = LocateRegistry.getRegistry(hostname);
@@ -136,9 +182,14 @@ public class Client {
             return;
         }
 
+        // Aplicação do usuário
         System.out.println("========== BANCO DE DADOS ==========");
         for (; ; ) {
-            final int operation = fetchOperation();
+            final Integer operation = fetchOperation();
+            if (operation == null) {
+                System.out.println("Operação inválida.");
+                continue;
+            }
             System.out.println();
             switch (operation) {
                 case 1: {
@@ -225,7 +276,7 @@ public class Client {
                         }
 
                         if (optional.isPresent()) {
-                            System.out.println("Experiências: " + optional.get().getExperience());
+                            System.out.println("Experiências: " + optional.get().getExperiences());
                         } else {
                             System.out.println("O e-mail informado não se encontra na base de dados.");
                         }
@@ -275,8 +326,6 @@ public class Client {
                 }
                 case 0:
                     return;
-                default:
-                    System.out.println("Opção inválida.");
             }
             System.out.println();
         }

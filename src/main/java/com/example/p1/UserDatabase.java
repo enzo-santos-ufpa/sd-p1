@@ -3,8 +3,20 @@ package com.example.p1;
 import java.io.Serializable;
 import java.util.*;
 
+/**
+ * Representa uma base de dados de múltiplos usuários.
+ * <p>
+ * Um usuário só pode ser adicionado nessa base se não existe um usuário com seu e-mail já presente.
+ */
 public class UserDatabase implements UserCollection, Serializable {
+    /**
+     * Campo de serialização.
+     */
     private static final long serialVersionUID = -1222122104L;
+
+    /**
+     * Usuários dessa base de dados.
+     */
     private final Set<User> users = new HashSet<>();
 
     @Override
