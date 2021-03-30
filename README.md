@@ -2,6 +2,20 @@
 
 Trabalho de implementação da 1ª avaliação da disciplina de Sistemas Distribuídos.
 
+A aplicação simula um servidor de uma universidade, onde cada usuário possui 
+e-mail, nome, endereço, formação acadêmica, habilidades, experiências profissionais
+e uma foto de perfil (opcional).
+
+É possível realizar as seguintes operações:
+
+- adicionar um usuário
+- listar usuários por curso
+- listar habilidades de usuários por endereço
+- acrescentar experiência de um usuário
+- exibir a experiência de um usuário
+- listar informações de um ou de todos os usuários
+
+
 ## Instalação
 
 0. Definir uma variável local para o diretório raiz do projeto (opcional)
@@ -85,18 +99,3 @@ java \
     -cp $ROOT/build/classes/java/main/ \
     com.example.p1.Client [host]
 ```
-
-## Uso
-
-A aplicação simula um servidor de uma universidade, onde cada usuário possui 
-e-mail, nome, endereço, formação acadêmica, habilidades, experiências profissionais
-e uma foto de perfil (opcional).
-
-É possível realizar as seguintes operações:
-
-- adicionar um usuário
-- listar usuários por curso
-- listar habilidades de usuários por endereço
-- acrescentar experiência de um usuário
-- exibir a experiência de um usuário
-- listar informações de um ou de todos os usuários
